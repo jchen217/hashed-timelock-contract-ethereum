@@ -11,6 +11,25 @@
 
 Use these contracts for creating HTLCs on the Ethereum side of a cross chain atomic swap (for example the [xcat](https://github.com/chatch/xcat) project).
 
+## Lost Token Risk in HTLC
+An account that deposits value (mis)using ERC20's `transfer` function instead of `approve-transferFrom` is unable to call `withdraw` function with success. This implies the mis-deposited tokens are lost.
+### Test case of the lost token risk
+Use the command below to execute the test:
+```
+$ npm install
+$ npm run ganache-start
+$ npm run test
+```
+
+In the first case, the sender calls `transfer` and `approve-transferFrom` to deposit 5 tokens separately. When the receiver calls `withdraw`, he can only withdraw 5 tokens.
+In the second case, the sender calls `approve-transferFrom` to deposit 5 tokens. The receiver can withdraw 5 tokens as normal.
+In the third case, the sender only calls `transfer` to deposit 5 tokens. The `withdraw` function will revert and the receiver can never withdraw his tokens. The tokens are lost.
+
+Here is the screenshot of the test result:
+![](HTLC_test_result.png?raw=true)
+
+
+
 ## Run Tests
 * Install dependencies
 * Start [Ganache](https://www.trufflesuite.com/ganache) with network ID `4447`
